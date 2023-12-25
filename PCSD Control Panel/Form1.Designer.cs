@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             button1 = new Button();
             panelSystem = new Panel();
@@ -44,8 +43,9 @@
             button2 = new Button();
             button3 = new Button();
             button4 = new Button();
-            timer1 = new System.Windows.Forms.Timer(components);
             panelSetting = new Panel();
+            label15 = new Label();
+            numericUpDown1 = new NumericUpDown();
             label10 = new Label();
             label9 = new Label();
             label2 = new Label();
@@ -64,6 +64,7 @@
             tableLayoutPanel1.SuspendLayout();
             panelTopBar.SuspendLayout();
             panelSetting.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
             panelUSBDisplay.SuspendLayout();
             SuspendLayout();
             // 
@@ -267,13 +268,11 @@
             button4.UseVisualStyleBackColor = false;
             button4.Click += button4_Click;
             // 
-            // timer1
-            // 
-            timer1.Tick += timer1_Tick_1;
-            // 
             // panelSetting
             // 
             panelSetting.BackColor = Color.FromArgb(20, 20, 20);
+            panelSetting.Controls.Add(label15);
+            panelSetting.Controls.Add(numericUpDown1);
             panelSetting.Controls.Add(label10);
             panelSetting.Controls.Add(label9);
             panelSetting.Controls.Add(label2);
@@ -283,6 +282,30 @@
             panelSetting.Name = "panelSetting";
             panelSetting.Size = new Size(377, 212);
             panelSetting.TabIndex = 2;
+            // 
+            // label15
+            // 
+            label15.AutoSize = true;
+            label15.Location = new Point(37, 115);
+            label15.Name = "label15";
+            label15.Size = new Size(148, 19);
+            label15.TabIndex = 8;
+            label15.Text = "Update speed (ms) :";
+            // 
+            // numericUpDown1
+            // 
+            numericUpDown1.BackColor = Color.FromArgb(64, 64, 64);
+            numericUpDown1.BorderStyle = BorderStyle.FixedSingle;
+            numericUpDown1.Font = new Font("Microsoft JhengHei UI", 10.2F, FontStyle.Regular, GraphicsUnit.Point, 136);
+            numericUpDown1.ForeColor = SystemColors.Window;
+            numericUpDown1.Increment = new decimal(new int[] { 100, 0, 0, 0 });
+            numericUpDown1.Location = new Point(239, 111);
+            numericUpDown1.Maximum = new decimal(new int[] { 9999, 0, 0, 0 });
+            numericUpDown1.Minimum = new decimal(new int[] { 100, 0, 0, 0 });
+            numericUpDown1.Name = "numericUpDown1";
+            numericUpDown1.Size = new Size(123, 29);
+            numericUpDown1.TabIndex = 7;
+            numericUpDown1.Value = new decimal(new int[] { 1000, 0, 0, 0 });
             // 
             // label10
             // 
@@ -462,6 +485,7 @@
             panelTopBar.PerformLayout();
             panelSetting.ResumeLayout(false);
             panelSetting.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)numericUpDown1).EndInit();
             panelUSBDisplay.ResumeLayout(false);
             panelUSBDisplay.PerformLayout();
             ResumeLayout(false);
@@ -476,13 +500,8 @@
         private Label label1;
         private Button button3;
         private Button button4;
-        private Label label5;
         private Label label4;
         private Label label3;
-        private Label label6;
-        private Label label7;
-        private Label label8;
-        private System.Windows.Forms.Timer timer1;
         private TableLayoutPanel tableLayoutPanel1;
         private Panel panelSetting;
         private Panel panelUSBDisplay;
@@ -499,5 +518,11 @@
         private Label label13;
         private Button button7;
         private Button button8;
+        private Label label15;
+        private NumericUpDown numericUpDown1;
+        private Label label5;
+        private Label label6;
+        private Label label7;
+        private Label label8;
     }
 }

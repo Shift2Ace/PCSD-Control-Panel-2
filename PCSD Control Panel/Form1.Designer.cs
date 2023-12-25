@@ -28,13 +28,14 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            label5 = new Label();
             button1 = new Button();
             panelSystem = new Panel();
             tableLayoutPanel1 = new TableLayoutPanel();
             label8 = new Label();
             label4 = new Label();
-            label5 = new Label();
             label3 = new Label();
             label7 = new Label();
             label6 = new Label();
@@ -60,6 +61,7 @@
             label11 = new Label();
             comboBox2 = new ComboBox();
             comboBox1 = new ComboBox();
+            timer1 = new System.Windows.Forms.Timer(components);
             panelSystem.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
             panelTopBar.SuspendLayout();
@@ -67,6 +69,20 @@
             ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
             panelUSBDisplay.SuspendLayout();
             SuspendLayout();
+            // 
+            // label5
+            // 
+            label5.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            label5.AutoSize = true;
+            label5.Font = new Font("Microsoft JhengHei UI", 19.8000011F, FontStyle.Regular, GraphicsUnit.Point, 136);
+            label5.ImageAlign = ContentAlignment.MiddleRight;
+            label5.Location = new Point(123, 40);
+            label5.Margin = new Padding(3, 40, 3, 0);
+            label5.Name = "label5";
+            label5.Size = new Size(85, 43);
+            label5.TabIndex = 3;
+            label5.Text = "0 °C";
+            label5.TextAlign = ContentAlignment.MiddleRight;
             // 
             // button1
             // 
@@ -136,20 +152,6 @@
             label4.Size = new Size(54, 25);
             label4.TabIndex = 2;
             label4.Text = "GPU";
-            // 
-            // label5
-            // 
-            label5.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            label5.AutoSize = true;
-            label5.Font = new Font("Microsoft JhengHei UI", 19.8000011F, FontStyle.Regular, GraphicsUnit.Point, 136);
-            label5.ImageAlign = ContentAlignment.MiddleRight;
-            label5.Location = new Point(123, 40);
-            label5.Margin = new Padding(3, 40, 3, 0);
-            label5.Name = "label5";
-            label5.Size = new Size(85, 43);
-            label5.TabIndex = 3;
-            label5.Text = "0 °C";
-            label5.TextAlign = ContentAlignment.MiddleRight;
             // 
             // label3
             // 
@@ -306,6 +308,7 @@
             numericUpDown1.Size = new Size(123, 29);
             numericUpDown1.TabIndex = 7;
             numericUpDown1.Value = new decimal(new int[] { 1000, 0, 0, 0 });
+            numericUpDown1.ValueChanged += numericUpDown1_ValueChanged;
             // 
             // label10
             // 
@@ -459,6 +462,10 @@
             comboBox1.Sorted = true;
             comboBox1.TabIndex = 0;
             // 
+            // timer1
+            // 
+            timer1.Tick += timer1_Tick;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(9F, 19F);
@@ -506,7 +513,6 @@
         private Panel panelSetting;
         private Panel panelUSBDisplay;
         private Button button5;
-        private Button button6;
         private Label label2;
         private Label label9;
         private Label label10;
@@ -520,9 +526,11 @@
         private Button button8;
         private Label label15;
         private NumericUpDown numericUpDown1;
-        private static Label label5;
-        private static Label label6;
-        private static Label label7;
-        private static Label label8;
+        private System.Windows.Forms.Timer timer1;
+        public Label label6;
+        public Label label7;
+        public Label label8;
+        public Label label5;
+        public Button button6;
     }
 }

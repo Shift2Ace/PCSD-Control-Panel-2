@@ -520,9 +520,9 @@
         private Button button8;
         private Label label15;
         private NumericUpDown numericUpDown1;
-        private Label label5;
-        private Label label6;
-        private Label label7;
-        private Label label8;
+        private static Label label5;
+        private static Label label6;
+        private static Label label7;
+        private static Label label8;
     }
 }

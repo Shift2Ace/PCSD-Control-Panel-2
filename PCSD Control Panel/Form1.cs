@@ -1,6 +1,7 @@
 using Microsoft.VisualBasic.Devices;
 using Microsoft.Win32;
 using OpenHardwareMonitor.Hardware;
+using OpenHardwareMonitor;
 using System.Diagnostics;
 using System.IO.Ports;
 using System.Reflection;
@@ -211,7 +212,7 @@ namespace PCSD_Control_Panel_2._0
                 }
             }catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                //MessageBox.Show(ex.Message, "Error (getStatus)", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             
         });
@@ -267,7 +268,10 @@ namespace PCSD_Control_Panel_2._0
                         if (sensor.Name == "CPU Package" && sensor.SensorType == SensorType.Temperature)
                         {
                             hardware.Update();
-                            return ((int)sensor.Value);
+                            if (sensor.Value != null)
+                            {
+                                return ((int)sensor.Value);
+                            }
                         }
                     }
                 }
@@ -285,7 +289,10 @@ namespace PCSD_Control_Panel_2._0
                         if (sensor.Name == "GPU Core" && sensor.SensorType == SensorType.Temperature)
                         {
                             hardware.Update();
-                            return ((int)sensor.Value);
+                            if (sensor.Value != null)
+                            {
+                                return ((int)sensor.Value);
+                            }
                         }
                     }
                 }
@@ -303,7 +310,10 @@ namespace PCSD_Control_Panel_2._0
                         if (sensor.Name == "CPU Total" && sensor.SensorType == SensorType.Load)
                         {
                             hardware.Update();
-                            return ((int)sensor.Value);
+                            if (sensor.Value != null)
+                            {
+                                return ((int)sensor.Value);
+                            }
                         }
                     }
                 }
@@ -321,7 +331,10 @@ namespace PCSD_Control_Panel_2._0
                         if (sensor.Name == "GPU Core" && sensor.SensorType == SensorType.Load)
                         {
                             hardware.Update();
-                            return ((int)sensor.Value);
+                            if (sensor.Value != null)
+                            {
+                                return ((int)sensor.Value);
+                            }
                         }
                     }
                 }

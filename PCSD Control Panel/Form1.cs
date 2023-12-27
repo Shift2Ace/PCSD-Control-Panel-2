@@ -193,20 +193,27 @@ namespace PCSD_Control_Panel_2._0
         // Get status
         Thread getStatus = new Thread(delegate ()
         {
-            int cpuTempTmp, cpuUsageTmp, gpuTempTmp, gpuUsageTmp;
-            while (true)
+            try
             {
-                // Get the current values of CPU and GPU temperature and usage
-                cpuTempTmp = GetCPUTemp();
-                gpuTempTmp = GetGPUTemp();
-                cpuUsageTmp = GetCPUUsage();
-                gpuUsageTmp = GetGPUUsage();
-                cpuTemp = cpuTempTmp;
-                gpuTemp = gpuTempTmp;
-                cpuUsage = cpuUsageTmp;
-                gpuUsage = gpuUsageTmp;
-                Thread.Sleep(Properties.Settings.Default.update_speed);
+                int cpuTempTmp, cpuUsageTmp, gpuTempTmp, gpuUsageTmp;
+                while (true)
+                {
+                    // Get the current values of CPU and GPU temperature and usage
+                    cpuTempTmp = GetCPUTemp();
+                    gpuTempTmp = GetGPUTemp();
+                    cpuUsageTmp = GetCPUUsage();
+                    gpuUsageTmp = GetGPUUsage();
+                    cpuTemp = cpuTempTmp;
+                    gpuTemp = gpuTempTmp;
+                    cpuUsage = cpuUsageTmp;
+                    gpuUsage = gpuUsageTmp;
+                    Thread.Sleep(Properties.Settings.Default.update_speed);
+                }
+            }catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            
         });
 
         // Send status

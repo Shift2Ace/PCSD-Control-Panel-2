@@ -62,12 +62,18 @@
             comboBox2 = new ComboBox();
             comboBox1 = new ComboBox();
             timer1 = new System.Windows.Forms.Timer(components);
+            timer2 = new System.Windows.Forms.Timer(components);
+            contextMenuStrip1 = new ContextMenuStrip(components);
+            openToolStripMenuItem = new ToolStripMenuItem();
+            exitToolStripMenuItem = new ToolStripMenuItem();
+            notifyIcon1 = new NotifyIcon(components);
             panelSystem.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
             panelTopBar.SuspendLayout();
             panelSetting.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
             panelUSBDisplay.SuspendLayout();
+            contextMenuStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // label5
@@ -107,7 +113,7 @@
             panelSystem.Location = new Point(208, 45);
             panelSystem.Name = "panelSystem";
             panelSystem.Size = new Size(377, 212);
-            panelSystem.TabIndex = 2;
+            panelSystem.TabIndex = 5;
             // 
             // tableLayoutPanel1
             // 
@@ -283,7 +289,7 @@
             panelSetting.Location = new Point(208, 45);
             panelSetting.Name = "panelSetting";
             panelSetting.Size = new Size(377, 212);
-            panelSetting.TabIndex = 2;
+            panelSetting.TabIndex = 0;
             // 
             // label15
             // 
@@ -297,15 +303,16 @@
             // numericUpDown1
             // 
             numericUpDown1.BackColor = Color.FromArgb(64, 64, 64);
-            numericUpDown1.BorderStyle = BorderStyle.FixedSingle;
+            numericUpDown1.BorderStyle = BorderStyle.None;
             numericUpDown1.Font = new Font("Microsoft JhengHei UI", 10.2F, FontStyle.Regular, GraphicsUnit.Point, 136);
             numericUpDown1.ForeColor = SystemColors.Window;
             numericUpDown1.Increment = new decimal(new int[] { 100, 0, 0, 0 });
             numericUpDown1.Location = new Point(239, 111);
-            numericUpDown1.Maximum = new decimal(new int[] { 9999, 0, 0, 0 });
-            numericUpDown1.Minimum = new decimal(new int[] { 100, 0, 0, 0 });
+            numericUpDown1.Maximum = new decimal(new int[] { 99999, 0, 0, 0 });
+            numericUpDown1.Minimum = new decimal(new int[] { 1000, 0, 0, 0 });
             numericUpDown1.Name = "numericUpDown1";
-            numericUpDown1.Size = new Size(123, 29);
+            numericUpDown1.ReadOnly = true;
+            numericUpDown1.Size = new Size(123, 25);
             numericUpDown1.TabIndex = 7;
             numericUpDown1.Value = new decimal(new int[] { 1000, 0, 0, 0 });
             numericUpDown1.ValueChanged += numericUpDown1_ValueChanged;
@@ -347,6 +354,7 @@
             button6.TabIndex = 3;
             button6.Text = "Enable";
             button6.UseVisualStyleBackColor = false;
+            button6.Click += button6_Click;
             // 
             // button5
             // 
@@ -388,6 +396,7 @@
             button8.TabIndex = 7;
             button8.Text = "Run";
             button8.UseVisualStyleBackColor = false;
+            button8.Click += button8_Click;
             // 
             // label14
             // 
@@ -419,6 +428,7 @@
             button7.TabIndex = 4;
             button7.Text = "Apply";
             button7.UseVisualStyleBackColor = false;
+            button7.Click += button7_Click;
             // 
             // label12
             // 
@@ -447,7 +457,6 @@
             comboBox2.Location = new Point(169, 73);
             comboBox2.Name = "comboBox2";
             comboBox2.Size = new Size(186, 27);
-            comboBox2.Sorted = true;
             comboBox2.TabIndex = 1;
             // 
             // comboBox1
@@ -461,10 +470,42 @@
             comboBox1.Size = new Size(186, 27);
             comboBox1.Sorted = true;
             comboBox1.TabIndex = 0;
+            comboBox1.MouseClick += comboBox1_MouseClick;
             // 
             // timer1
             // 
             timer1.Tick += timer1_Tick;
+            // 
+            // timer2
+            // 
+            timer2.Tick += timer2_Tick;
+            // 
+            // contextMenuStrip1
+            // 
+            contextMenuStrip1.ImageScalingSize = new Size(20, 20);
+            contextMenuStrip1.Items.AddRange(new ToolStripItem[] { openToolStripMenuItem, exitToolStripMenuItem });
+            contextMenuStrip1.Name = "contextMenuStrip1";
+            contextMenuStrip1.Size = new Size(117, 52);
+            // 
+            // openToolStripMenuItem
+            // 
+            openToolStripMenuItem.Name = "openToolStripMenuItem";
+            openToolStripMenuItem.Size = new Size(116, 24);
+            openToolStripMenuItem.Text = "Open";
+            openToolStripMenuItem.Click += openToolStripMenuItem_Click;
+            // 
+            // exitToolStripMenuItem
+            // 
+            exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+            exitToolStripMenuItem.Size = new Size(116, 24);
+            exitToolStripMenuItem.Text = "Exit";
+            exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
+            // 
+            // notifyIcon1
+            // 
+            notifyIcon1.BalloonTipIcon = ToolTipIcon.Info;
+            notifyIcon1.Visible = true;
+            notifyIcon1.MouseDoubleClick += notifyIcon1_MouseDoubleClick;
             // 
             // Form1
             // 
@@ -473,18 +514,19 @@
             BackColor = Color.FromArgb(64, 64, 64);
             ClientSize = new Size(597, 269);
             Controls.Add(button4);
-            Controls.Add(panelSetting);
             Controls.Add(button3);
             Controls.Add(panelTopBar);
-            Controls.Add(panelSystem);
-            Controls.Add(panelUSBDisplay);
             Controls.Add(button1);
+            Controls.Add(panelUSBDisplay);
+            Controls.Add(panelSetting);
+            Controls.Add(panelSystem);
             ForeColor = SystemColors.AppWorkspace;
             FormBorderStyle = FormBorderStyle.None;
             Name = "Form1";
             ShowIcon = false;
             Text = "Form1";
             Load += Form1_Load;
+            Shown += Form1_Shown;
             panelSystem.ResumeLayout(false);
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
@@ -495,6 +537,7 @@
             ((System.ComponentModel.ISupportInitialize)numericUpDown1).EndInit();
             panelUSBDisplay.ResumeLayout(false);
             panelUSBDisplay.PerformLayout();
+            contextMenuStrip1.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -532,5 +575,10 @@
         public Label label8;
         public Label label5;
         public Button button6;
+        private System.Windows.Forms.Timer timer2;
+        private ContextMenuStrip contextMenuStrip1;
+        private ToolStripMenuItem openToolStripMenuItem;
+        private ToolStripMenuItem exitToolStripMenuItem;
+        private NotifyIcon notifyIcon1;
     }
 }

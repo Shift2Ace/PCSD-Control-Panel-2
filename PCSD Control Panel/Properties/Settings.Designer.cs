@@ -67,5 +67,41 @@ namespace PCSD_Control_Panel_2._0.Properties {
                 this["update_speed"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool status {
+            get {
+                return ((bool)(this["status"]));
+            }
+            set {
+                this["status"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("PCSD Control Panel")]
+        public string appName {
+            get {
+                return ((string)(this["appName"]));
+            }
+            set {
+                this["appName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool autoStartup {
+            get {
+                return ((bool)(this["autoStartup"]));
+            }
+            set {
+                this["autoStartup"] = value;
+            }
+        }
     }
 }

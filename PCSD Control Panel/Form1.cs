@@ -1,7 +1,11 @@
 using Microsoft.VisualBasic.Devices;
+using Microsoft.Win32;
 using OpenHardwareMonitor.Hardware;
 using System.Diagnostics;
+using System.IO.Ports;
+using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Threading;
 
 
@@ -10,21 +14,29 @@ namespace PCSD_Control_Panel_2._0
 {
     public partial class Form1 : Form
     {
-        // Declare some variables to store the mouse position and the dragging state
+        // top bar
         bool dragging = false;
         Point offset;
         Point original;
 
-        // Declare computer object for accessing hardware sensors
+        // OpenHardwareMonitor
         private static OpenHardwareMonitor.Hardware.Computer myComputer;
 
-        // Declare variables for CPU and GPU temperature
+        // CPU/GPU temperature/usage
         private static int cpuTemp;
         private static int gpuTemp;
         private static int cpuUsage;
         private static int gpuUsage;
 
-        private System.Windows.Forms.Timer timer;
+
+        // USB Display
+        private object[] buadRateSet = { 300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000, 500000, 1000000, 2000000 };
+        private static SerialPort port = new SerialPort();
+
+        // Auto startup
+        private static readonly string StartupKey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
+        private static readonly string StartupValue = Application.ProductName;
+
 
         //init
         public Form1()
@@ -36,27 +48,115 @@ namespace PCSD_Control_Panel_2._0
             myComputer.Open();
             myComputer.CPUEnabled = true;
             myComputer.GPUEnabled = true;
-            numericUpDown1.Value = Properties.Settings.Default.update_speed;
-            displayStatus.IsBackground = true;
-            displayStatus.Start();
-            timer = new System.Windows.Forms.Timer();
-            timer.Interval = 250;
-            timer.Tick += new EventHandler(timer1_Tick);
-        }
 
+            //start to get status
+            getStatus.IsBackground = true;
+            getStatus.Start();
+
+            //init timer
+            timer1 = new System.Windows.Forms.Timer();
+            timer1.Interval = 250;
+            timer1.Tick += new EventHandler(timer1_Tick);
+            timer2 = new System.Windows.Forms.Timer();
+            timer2.Interval = 100;
+            timer2.Tick += new EventHandler(timer2_Tick);
+
+            //init USB display
+            comboBox1.Items.AddRange(getPortName());
+            comboBox2.Items.AddRange(buadRateSet);
+
+            //notify icon
+            notifyIcon1.Icon = Properties.Resources.PCSD_Control_Panel;
+            notifyIcon1.Text = Properties.Settings.Default.appName;
+            notifyIcon1.ContextMenuStrip = contextMenuStrip1;
+            notifyIcon1.Visible = true;
+
+            //form
+            this.Text = Properties.Settings.Default.appName;
+
+
+        }
         private void Form1_Load(object sender, EventArgs e)
         {
+            //form setup
             panelSystem.Visible = true;
             panelSetting.Visible = false;
             panelUSBDisplay.Visible = false;
-            timer.Start();
+
+            //start timer
+            timer1.Start();
+            timer2.Start();
+
+            //get value from properties settings
+            numericUpDown1.Value = Properties.Settings.Default.update_speed;
+            comboBox1.SelectedIndex = comboBox1.Items.IndexOf(Properties.Settings.Default.port);
+            comboBox2.SelectedIndex = comboBox2.Items.IndexOf((int)Properties.Settings.Default.buad_rate);
+
+            //icon
+            this.Icon = Properties.Resources.PCSD_Control_Panel; // Set the form icon
+            notifyIcon1.Icon = Properties.Resources.PCSD_Control_Panel; // Set the notify icon
+
+            //start sending data to USB display
+            if (Properties.Settings.Default.status)
+            {
+                Thread sendDataThread = new Thread(sendStatus);
+                sendDataThread.IsBackground = true;
+                sendDataThread.Start();
+            }
+
+            //check registry key
+            RegistryKey key = Registry.CurrentUser.OpenSubKey(StartupKey, true);
+            if (key != null)
+            {
+                try
+                {
+                    string value = key.GetValue(StartupValue).ToString();
+                    Properties.Settings.Default.autoStartup = (value != "");
+                }
+                catch (Exception ex)
+                {
+                    Properties.Settings.Default.autoStartup = false;
+                }
+                
+            }
+        }
+        private void Form1_Shown(object sender, EventArgs e)
+        {
+            if (Properties.Settings.Default.status)
+            {
+                this.Visible = false;
+            }
+        }
+        private static void SetStartup(bool enable)
+        {
+            if (enable)
+            {
+                //Set the application to run at startup
+                RegistryKey key = Registry.CurrentUser.OpenSubKey(StartupKey, true);
+                key.SetValue(StartupValue, Application.ExecutablePath.ToString());
+            }
+            else
+            {
+                //Delete the application from the startup
+                RegistryKey key = Registry.CurrentUser.OpenSubKey(StartupKey, true);
+                key.SetValue(StartupValue, "");
+            }
 
         }
+
+        private object[] getPortName()
+        {
+            SerialPort detectPort = new SerialPort();
+            string[] ports = SerialPort.GetPortNames();
+            return ports;
+        }
+
         // Close button
         private void button2_Click(object sender, EventArgs e)
         {
             // Close the form
-            this.Close();
+            this.Visible = false;
+            timer1.Stop();
         }
 
         // Top bar
@@ -91,7 +191,7 @@ namespace PCSD_Control_Panel_2._0
         }
 
         // Get status
-        Thread displayStatus = new Thread(delegate ()
+        Thread getStatus = new Thread(delegate ()
         {
             int cpuTempTmp, cpuUsageTmp, gpuTempTmp, gpuUsageTmp;
             while (true)
@@ -109,6 +209,36 @@ namespace PCSD_Control_Panel_2._0
             }
         });
 
+        // Send status
+        static public void sendStatus()
+        {
+            port.Close();
+            port.BaudRate = Properties.Settings.Default.buad_rate;
+            port.PortName = Properties.Settings.Default.port;
+            port.Open();
+            while (Properties.Settings.Default.status)
+            {
+                try
+                {
+                    String cpuTempText, cpuUsageText, gpuTempText, gpuUsageText;
+                    cpuTempText = 1000 + cpuTemp + "";
+                    cpuUsageText = 1000 + cpuUsage + "";
+                    gpuTempText = 1000 + gpuTemp + "";
+                    gpuUsageText = 1000 + gpuUsage + "";
+                    port.Write(cpuTempText + cpuUsageText + gpuTempText + gpuUsageText);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Properties.Settings.Default.status = false;
+                    Properties.Settings.Default.Save();
+                }
+                Thread.Sleep(Properties.Settings.Default.update_speed);
+            }
+            port.Close();
+
+        }
+        // Get value
         private static int GetCPUTemp()
         {
             foreach (var hardware in myComputer.Hardware)
@@ -188,14 +318,14 @@ namespace PCSD_Control_Panel_2._0
             panelSystem.Visible = false;
             panelSetting.Visible = false;
             panelUSBDisplay.Visible = true;
-            timer.Stop();
+            timer1.Stop();
         }
         private void button4_Click(object sender, EventArgs e)
         {
             panelSystem.Visible = false;
             panelSetting.Visible = true;
             panelUSBDisplay.Visible = false;
-            timer.Stop();
+            timer1.Stop();
 
         }
         private void button1_Click(object sender, EventArgs e)
@@ -203,7 +333,7 @@ namespace PCSD_Control_Panel_2._0
             panelSystem.Visible = true;
             panelSetting.Visible = false;
             panelUSBDisplay.Visible = false;
-            timer.Start();
+            timer1.Start();
         }
 
         //console app button
@@ -211,20 +341,112 @@ namespace PCSD_Control_Panel_2._0
         {
             Process.Start("Console.exe");
         }
-
+        // update static in system page
         private void timer1_Tick(object sender, EventArgs e)
         {
 
-            label5.Text = cpuTemp.ToString() + " ¢XC";
-            label6.Text = gpuTemp.ToString() + " ¢XC";
-            label8.Text = cpuUsage.ToString() + " %";
-            label7.Text = gpuUsage.ToString() + " %";
+            label5.Text = $"{cpuTemp} ¢XC";
+            label6.Text = $"{gpuTemp} ¢XC";
+            label8.Text = $"{cpuUsage} %";
+            label7.Text = $"{gpuUsage} %";
         }
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
             Properties.Settings.Default.update_speed = Convert.ToInt32(numericUpDown1.Value);
             Properties.Settings.Default.Save();
+        }
+
+
+        // button to run or stop the USB display
+        private void button8_Click(object sender, EventArgs e)
+        {
+            if (!Properties.Settings.Default.status)
+            {
+                Thread sendDataThread = new Thread(sendStatus);
+                sendDataThread.IsBackground = true;
+                sendDataThread.Start();
+            }
+            Properties.Settings.Default.status = !Properties.Settings.Default.status;
+            Properties.Settings.Default.Save();
+        }
+        // button to apply USB display setting
+        private void button7_Click(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.port = comboBox1.Text;
+            Properties.Settings.Default.buad_rate = Convert.ToInt32(comboBox2.Text);
+            port.Close();
+            port.BaudRate = Properties.Settings.Default.buad_rate;
+            port.PortName = Properties.Settings.Default.port;
+            port.Open();
+            if (Properties.Settings.Default.status)
+            {
+                Properties.Settings.Default.status = false;
+            }
+            Properties.Settings.Default.Save();
+        }
+        // update port selection when click the comboBox
+        private void comboBox1_MouseClick(object sender, MouseEventArgs e)
+        {
+            comboBox1.Items.Clear();
+            comboBox1.Items.AddRange(getPortName());
+        }
+
+        // keep checking
+        private void timer2_Tick(object sender, EventArgs e)
+        {
+            if (Properties.Settings.Default.status)
+            {
+                button8.Text = "Stop";
+                label14.Text = "active";
+                label14.ForeColor = Color.Lime;
+                button7.Enabled = false;
+                comboBox1.Enabled = false;
+                comboBox2.Enabled = false;
+            }
+            else
+            {
+                button8.Text = "Run";
+                label14.Text = "inactive";
+                label14.ForeColor = Color.Red;
+                button7.Enabled = true;
+                comboBox1.Enabled = true;
+                comboBox2.Enabled = true;
+            }
+            if (Properties.Settings.Default.autoStartup)
+            {
+                button6.Text = "Disable";
+            }
+            else
+            {
+                button6.Text = "Enable";
+            }
+        }
+
+        // Tool strip menu - open
+        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Visible = true;
+            timer1.Start();
+        }
+        // Tool strip menu - exit
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        // Start when system startkup button
+        private void button6_Click(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.autoStartup = !Properties.Settings.Default.autoStartup;
+            SetStartup(Properties.Settings.Default.autoStartup);
+            Properties.Settings.Default.Save();
+        }
+
+        private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            this.Visible = true;
+            timer1.Start();
         }
     }
 }

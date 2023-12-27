@@ -14,5 +14,14 @@
     <Setting Name="update_speed" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1000</Value>
     </Setting>
+    <Setting Name="status" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="appName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">PCSD Control Panel</Value>
+    </Setting>
+    <Setting Name="autoStartup" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

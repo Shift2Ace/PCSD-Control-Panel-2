@@ -1,13 +1,9 @@
-using Microsoft.VisualBasic.Devices;
 using Microsoft.Win32;
 using OpenHardwareMonitor.Hardware;
-using OpenHardwareMonitor;
 using System.Diagnostics;
+using System.Management;
 using System.IO.Ports;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Runtime.Versioning;
-using System.Threading;
+
 
 
 
@@ -21,7 +17,7 @@ namespace PCSD_Control_Panel_2._0
         Point original;
 
         // OpenHardwareMonitor
-        private static OpenHardwareMonitor.Hardware.Computer myComputer;
+        private static Computer? myComputer;
 
         // CPU/GPU temperature/usage
         private static int cpuTemp;
@@ -36,7 +32,7 @@ namespace PCSD_Control_Panel_2._0
 
         // Auto startup
         private static readonly string StartupKey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
-        private static readonly string StartupValue = Application.ProductName;
+        private static readonly string StartupValue = Application.ProductName+"";
 
 
         //init
@@ -45,7 +41,7 @@ namespace PCSD_Control_Panel_2._0
             InitializeComponent();
 
             // Initialize computer object and enable CPU and GPU sensors
-            myComputer = new OpenHardwareMonitor.Hardware.Computer();
+            myComputer = new Computer();
             myComputer.Open();
             myComputer.CPUEnabled = true;
             myComputer.GPUEnabled = true;
@@ -106,7 +102,7 @@ namespace PCSD_Control_Panel_2._0
             }
 
             //check registry key
-            RegistryKey key = Registry.CurrentUser.OpenSubKey(StartupKey, true);
+            RegistryKey? key = Registry.CurrentUser.OpenSubKey(StartupKey, true);
             if (key != null)
             {
                 try
@@ -212,7 +208,7 @@ namespace PCSD_Control_Panel_2._0
                 }
             }catch (Exception ex)
             {
-                //MessageBox.Show(ex.Message, "Error (getStatus)", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, "Error (getStatus)", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             
         });

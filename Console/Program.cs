@@ -1,5 +1,4 @@
 ﻿using OpenHardwareMonitor.Hardware;
-
 internal class Program
 {
     //menu and input
@@ -42,15 +41,15 @@ internal class Program
             //show menu
             for (var i = 0; i < choices.Length; i++)
             {
-                Console.WriteLine($"{i+1} ) {choices[i]} ");
+                Console.WriteLine($"{i + 1} ) {choices[i]} ");
             }
             //input number
             do
             {
                 Console.Write($"Enter number (1-{choices.Length}) : ");
-                choice = Console.ReadLine();
-            } 
-            while (!checkInput(choice,choices.Length));
+                choice = Console.ReadLine() + "";
+            }
+            while (!checkInput(choice, choices.Length));
             if (choices[Convert.ToInt32(choice) - 1] == "Show index")
             {
                 showIndex(computer);
@@ -59,7 +58,7 @@ internal class Program
             {
                 checkValue(computer);
             }
-            if (choices[Convert.ToInt32(choice)-1] != "Exit")
+            if (choices[Convert.ToInt32(choice) - 1] != "Exit")
             {
                 Console.WriteLine("Press <Enter> to Continue");
                 Console.ReadLine();
@@ -83,7 +82,7 @@ internal class Program
         {
             hardwareChoices.Add(hardware.Name);
             Console.WriteLine($"{hardwareChoices.Count} ) {hardware.Name}");
-            
+
         }
         hardwareChoices.Add("Exit");
         Console.WriteLine($"{hardwareChoices.Count} ) Exit");
@@ -91,10 +90,10 @@ internal class Program
         do
         {
             Console.Write($"Enter number (1-{hardwareChoices.Count}) : ");
-            hardwareChoice = Console.ReadLine();
+            hardwareChoice = Console.ReadLine() + "";
         }
         while (!checkInput(hardwareChoice, hardwareChoices.Count));
-        if  (Convert.ToInt32(hardwareChoice) != hardwareChoices.Count)
+        if (Convert.ToInt32(hardwareChoice) != hardwareChoices.Count)
         {
             // show sensors
             Console.Clear();
@@ -115,12 +114,12 @@ internal class Program
                     do
                     {
                         Console.Write($"Enter number (1-{sensorName.Count}) : ");
-                        sensorChoice = Console.ReadLine();
+                        sensorChoice = Console.ReadLine() + "";
                     }
                     while (!checkInput(sensorChoice, sensorName.Count));
                     if (Convert.ToInt32(sensorChoice) != sensorName.Count)
                     {
-                        foreach(var sensor in hardware.Sensors)
+                        foreach (var sensor in hardware.Sensors)
                         {
                             if (sensor.Name == sensorName[Convert.ToInt32(sensorChoice) - 1] && sensor.SensorType.ToString() == sensorType[Convert.ToInt32(sensorChoice) - 1])
                             {
@@ -149,7 +148,7 @@ internal class Program
                                 Console.SetCursorPosition(0, 6);
                             }
                         }
-                        
+
                     }
                 }
             }
@@ -160,7 +159,7 @@ internal class Program
         List<string> choices = new List<string>();
         for (int i = 0; i < choicesNum; i++)
         {
-            choices.Add((i+1).ToString());
+            choices.Add((i + 1).ToString());
         }
         if (choices.Contains(input))
         {
@@ -174,27 +173,22 @@ internal class Program
         Console.Clear();
         foreach (var hardware in computer.Hardware)
         {
-            if (hardware.HardwareType != null)
-            {
-                Console.Write(hardware.HardwareType.ToString());
-            }
+            Console.Write(hardware.HardwareType.ToString());
+
             if (hardware.Name != null)
             {
                 Console.Write(" : " + hardware.Name.ToString());
             }
             Console.WriteLine();
-            foreach (var sensor  in hardware.Sensors)
+            foreach (var sensor in hardware.Sensors)
             {
                 if (sensor.Name != null)
                 {
-                    Console.Write("   | "+sensor.Name.ToString());
+                    Console.Write("   | " + sensor.Name.ToString());
                 }
-                if (sensor.SensorType != null)
-                {
-                    Console.Write(" [" + sensor.SensorType.ToString() + "]");
-                }
+                Console.Write(" [" + sensor.SensorType.ToString() + "]");
                 Console.WriteLine();
-            }       
+            }
         }
     }
 }

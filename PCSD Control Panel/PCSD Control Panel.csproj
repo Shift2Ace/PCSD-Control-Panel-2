@@ -16,7 +16,7 @@
 
 
   <ItemGroup>
-    <PackageReference Include="OpenHardwareMonitorLibNet" Version="2023.11.10.1755" />
+    <PackageReference Include="OpenHardwareMonitorLibCore" Version="1.0.2" />
     <PackageReference Include="System.IO.Ports" Version="8.0.0" />
     <PackageReference Include="System.Management" Version="8.0.0" />
   </ItemGroup>

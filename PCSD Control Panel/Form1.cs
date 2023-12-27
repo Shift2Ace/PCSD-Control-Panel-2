@@ -212,10 +212,20 @@ namespace PCSD_Control_Panel_2._0
         // Send status
         static public void sendStatus()
         {
-            port.Close();
-            port.BaudRate = Properties.Settings.Default.buad_rate;
-            port.PortName = Properties.Settings.Default.port;
-            port.Open();
+            try
+            {
+                port.Close();
+                port.BaudRate = Properties.Settings.Default.buad_rate;
+                port.PortName = Properties.Settings.Default.port;
+                port.Open();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Properties.Settings.Default.status = false;
+                Properties.Settings.Default.Save();
+            }
+            
             while (Properties.Settings.Default.status)
             {
                 try
@@ -373,17 +383,24 @@ namespace PCSD_Control_Panel_2._0
         // button to apply USB display setting
         private void button7_Click(object sender, EventArgs e)
         {
-            Properties.Settings.Default.port = comboBox1.Text;
-            Properties.Settings.Default.buad_rate = Convert.ToInt32(comboBox2.Text);
-            port.Close();
-            port.BaudRate = Properties.Settings.Default.buad_rate;
-            port.PortName = Properties.Settings.Default.port;
-            port.Open();
-            if (Properties.Settings.Default.status)
+            try
             {
-                Properties.Settings.Default.status = false;
+                Properties.Settings.Default.port = comboBox1.Text;
+                Properties.Settings.Default.buad_rate = Convert.ToInt32(comboBox2.Text);
+                port.Close();
+                port.BaudRate = Properties.Settings.Default.buad_rate;
+                port.PortName = Properties.Settings.Default.port;
+                port.Open();
+                if (Properties.Settings.Default.status)
+                {
+                    Properties.Settings.Default.status = false;
+                }
+                Properties.Settings.Default.Save();
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            Properties.Settings.Default.Save();
+            
         }
         // update port selection when click the comboBox
         private void comboBox1_MouseClick(object sender, MouseEventArgs e)

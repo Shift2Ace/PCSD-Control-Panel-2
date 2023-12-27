@@ -1,7 +1,6 @@
 using Microsoft.Win32;
 using OpenHardwareMonitor.Hardware;
 using System.Diagnostics;
-using System.Management;
 using System.IO.Ports;
 
 
@@ -32,7 +31,7 @@ namespace PCSD_Control_Panel_2._0
 
         // Auto startup
         private static readonly string StartupKey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
-        private static readonly string StartupValue = Application.ProductName+"";
+        private static readonly string StartupValue = Application.ProductName + "";
 
 
         //init
@@ -114,7 +113,7 @@ namespace PCSD_Control_Panel_2._0
                 {
                     Properties.Settings.Default.autoStartup = false;
                 }
-                
+
             }
         }
         private void Form1_Shown(object sender, EventArgs e)
@@ -206,11 +205,12 @@ namespace PCSD_Control_Panel_2._0
                     gpuUsage = gpuUsageTmp;
                     Thread.Sleep(Properties.Settings.Default.update_speed);
                 }
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Error (getStatus)", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            
+
         });
 
         // Send status
@@ -229,7 +229,7 @@ namespace PCSD_Control_Panel_2._0
                 Properties.Settings.Default.status = false;
                 Properties.Settings.Default.Save();
             }
-            
+
             while (Properties.Settings.Default.status)
             {
                 try
@@ -412,11 +412,12 @@ namespace PCSD_Control_Panel_2._0
                     Properties.Settings.Default.status = false;
                 }
                 Properties.Settings.Default.Save();
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            
+
         }
         // update port selection when click the comboBox
         private void comboBox1_MouseClick(object sender, MouseEventArgs e)

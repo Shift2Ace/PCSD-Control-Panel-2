@@ -1,7 +1,8 @@
-using Microsoft.Win32;
+using Microsoft.Win32.TaskScheduler;
 using OpenHardwareMonitor.Hardware;
 using System.Diagnostics;
 using System.IO.Ports;
+
 
 
 
@@ -29,9 +30,11 @@ namespace PCSD_Control_Panel_2._0
         private object[] buadRateSet = { 300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000, 500000, 1000000, 2000000 };
         private static SerialPort port = new SerialPort();
 
-        // Auto startup
-        private static readonly string StartupKey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
-        private static readonly string StartupValue = Application.ProductName + "";
+
+        //task service
+        private static string folderName = Application.ProductName + "";
+        private static string programPath = Application.ExecutablePath.ToString();
+        private static string taskName = Application.ProductName + " startup";
 
 
         //init
@@ -69,8 +72,6 @@ namespace PCSD_Control_Panel_2._0
 
             //form
             this.Text = Properties.Settings.Default.appName;
-
-
         }
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -100,21 +101,9 @@ namespace PCSD_Control_Panel_2._0
                 sendDataThread.Start();
             }
 
-            //check registry key
-            RegistryKey? key = Registry.CurrentUser.OpenSubKey(StartupKey, true);
-            if (key != null)
-            {
-                try
-                {
-                    string value = key.GetValue(StartupValue).ToString();
-                    Properties.Settings.Default.autoStartup = (value != "");
-                }
-                catch (Exception ex)
-                {
-                    Properties.Settings.Default.autoStartup = false;
-                }
+            //create a folder in the root task folder
+            CreateFolder(folderName);
 
-            }
         }
         private void Form1_Shown(object sender, EventArgs e)
         {
@@ -123,22 +112,94 @@ namespace PCSD_Control_Panel_2._0
                 this.Visible = false;
             }
         }
-        private static void SetStartup(bool enable)
-        {
-            if (enable)
-            {
-                //Set the application to run at startup
-                RegistryKey key = Registry.CurrentUser.OpenSubKey(StartupKey, true);
-                key.SetValue(StartupValue, Application.ExecutablePath.ToString());
-            }
-            else
-            {
-                //Delete the application from the startup
-                RegistryKey key = Registry.CurrentUser.OpenSubKey(StartupKey, true);
-                key.SetValue(StartupValue, "");
-            }
 
+        // Create a folder in windows task scheduler if there don't have
+        static void CreateFolder(string folderName)
+        {
+            using (TaskService ts = new TaskService())
+            {
+                // Check if the folder already exists
+                if (ts.GetFolder("\\" + folderName) == null)
+                {
+                    // Create the folder
+                    ts.RootFolder.CreateFolder(folderName);
+                    Console.WriteLine("Folder created: " + folderName);
+                }
+                else
+                {
+                    Console.WriteLine("Folder already exists: " + folderName);
+                }
+            }
         }
+
+        // Create a task in this folder to make its program run in startup with administrator permission,if there don't have task
+        static void CreateTask(string folderName, string taskName, string programPath)
+        {
+            using (TaskService ts = new TaskService())
+            {
+                // Get the folder
+                TaskFolder folder = ts.GetFolder("\\" + folderName);
+                if (folder != null)
+                {
+                    // Check if the task already exists
+                    if (folder.GetTasks().FirstOrDefault(tt => tt.Name == taskName) == null)
+                    {
+                        // Create a new task definition
+                        TaskDefinition td = ts.NewTask();
+                        td.RegistrationInfo.Description = "Run a program at startup with administrator permission";
+
+                        // Set the trigger to run at startup
+                        td.Triggers.Add(new BootTrigger());
+
+                        // Set the action to run the program
+                        td.Actions.Add(new ExecAction(programPath));
+
+                        // Set the task to run as administrator
+                        td.Principal.RunLevel = TaskRunLevel.Highest;
+
+                        // Register the task in the folder
+                        folder.RegisterTaskDefinition(taskName, td);
+                        Console.WriteLine("Task created: " + taskName);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Task already exists: " + taskName);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Folder not found: " + folderName);
+                }
+            }
+        }
+        // Delete the task, if there have task
+        static void DeleteTask(string folderName, string taskName)
+        {
+            using (TaskService ts = new TaskService())
+            {
+                // Get the folder
+                TaskFolder folder = ts.GetFolder("\\" + folderName);
+                if (folder != null)
+                {
+                    // Check if the task exists
+                    if (folder.GetTasks().FirstOrDefault(tt => tt.Name == taskName) != null)
+                    {
+                        // Delete the task
+                        folder.DeleteTask(taskName);
+                        Console.WriteLine("Task deleted: " + taskName);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Task not found: " + taskName);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Folder not found: " + folderName);
+                }
+            }
+        }
+
 
         private object[] getPortName()
         {
@@ -469,11 +530,20 @@ namespace PCSD_Control_Panel_2._0
             this.Close();
         }
 
-        // Start when system startkup button
+        // Start when system startup button
         private void button6_Click(object sender, EventArgs e)
         {
             Properties.Settings.Default.autoStartup = !Properties.Settings.Default.autoStartup;
-            SetStartup(Properties.Settings.Default.autoStartup);
+            if (Properties.Settings.Default.autoStartup)
+            {
+                //Set the application to run at startup
+                CreateTask(folderName, taskName, programPath);
+            }
+            else
+            {
+                //Delete the application from the startup
+                DeleteTask(folderName, taskName);
+            }
             Properties.Settings.Default.Save();
         }
 

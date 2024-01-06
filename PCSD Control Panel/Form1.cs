@@ -149,7 +149,7 @@ namespace PCSD_Control_Panel_2._0
                         td.RegistrationInfo.Description = "Run a program at startup with administrator permission";
 
                         // Set the trigger to run at startup
-                        td.Triggers.Add(new BootTrigger());
+                        td.Triggers.Add(new LogonTrigger());
 
                         // Set the action to run the program
                         td.Actions.Add(new ExecAction(programPath));

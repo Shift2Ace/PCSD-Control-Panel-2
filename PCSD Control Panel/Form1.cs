@@ -45,8 +45,10 @@ namespace PCSD_Control_Panel_2._0
             // Initialize computer object and enable CPU and GPU sensors
             myComputer = new Computer();
             myComputer.Open();
-            myComputer.CPUEnabled = true;
-            myComputer.GPUEnabled = true;
+            //myComputer.CPUEnabled = true;
+            //myComputer.GPUEnabled = true;
+            myComputer.RAMEnabled = true;
+            myComputer.HDDEnabled = true;
 
             //start to get status
             getStatus.IsBackground = true;
@@ -257,9 +259,9 @@ namespace PCSD_Control_Panel_2._0
                 {
                     // Get the current values of CPU and GPU temperature and usage
                     cpuTempTmp = GetCPUTemp();
-                    gpuTempTmp = GetGPUTemp();
-                    cpuUsageTmp = GetCPUUsage();
-                    gpuUsageTmp = GetGPUUsage();
+                    gpuTempTmp = GetHDDTemp();
+                    cpuUsageTmp = GetRAMUsage();
+                    gpuUsageTmp = GetHDDUsage();
                     cpuTemp = cpuTempTmp;
                     gpuTemp = gpuTempTmp;
                     cpuUsage = cpuUsageTmp;
@@ -314,6 +316,71 @@ namespace PCSD_Control_Panel_2._0
 
         }
         // Get value
+        private static int GetRAMUsage()
+        {
+            foreach (var hardware in myComputer.Hardware)
+            {
+                if (hardware.HardwareType == HardwareType.RAM)
+                {
+                    foreach (var sensor in hardware.Sensors)
+                    {
+                        if (sensor.Name == "Memory" && sensor.SensorType == SensorType.Load)
+                        {
+                            hardware.Update();
+                            if (sensor.Value != null)
+                            {
+                                return ((int)sensor.Value);
+                            }
+                        }
+                    }
+                }
+            }
+            return 0;
+        }
+        private static int GetHDDUsage()
+        {
+            foreach (var hardware in myComputer.Hardware)
+            {
+                if (hardware.HardwareType == HardwareType.HDD)
+                {
+                    foreach (var sensor in hardware.Sensors)
+                    {
+                        if (sensor.Name == "Used Space" && sensor.SensorType == SensorType.Load)
+                        {
+                            hardware.Update();
+                            if (sensor.Value != null)
+                            {
+                                return ((int)sensor.Value);
+                            }
+                        }
+                    }
+                }
+            }
+            return 0;
+        }
+
+        private static int GetHDDTemp()
+        {
+            foreach (var hardware in myComputer.Hardware)
+            {
+                if (hardware.HardwareType == HardwareType.HDD)
+                {
+                    foreach (var sensor in hardware.Sensors)
+                    {
+                        if (sensor.SensorType == SensorType.Temperature)
+                        {
+                            hardware.Update();
+                            if (sensor.Value != null)
+                            {
+                                return ((int)sensor.Value);
+                            }
+                        }
+                    }
+                    return 0;
+                }
+            }
+            return 0;
+        }
         private static int GetCPUTemp()
         {
             foreach (var hardware in myComputer.Hardware)

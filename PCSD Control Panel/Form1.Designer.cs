@@ -152,22 +152,22 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Font = new Font("Microsoft JhengHei UI", 12F);
+            label4.Font = new Font("Microsoft JhengHei UI", 10.2F, FontStyle.Regular, GraphicsUnit.Point, 136);
             label4.Location = new Point(3, 103);
             label4.Name = "label4";
-            label4.Size = new Size(54, 25);
+            label4.Size = new Size(49, 22);
             label4.TabIndex = 2;
-            label4.Text = "GPU";
+            label4.Text = "HDD";
             // 
             // label3
             // 
             label3.AutoSize = true;
-            label3.Font = new Font("Microsoft JhengHei UI", 12F);
+            label3.Font = new Font("Microsoft JhengHei UI", 10.2F, FontStyle.Regular, GraphicsUnit.Point, 136);
             label3.Location = new Point(3, 0);
             label3.Name = "label3";
-            label3.Size = new Size(52, 25);
+            label3.Size = new Size(49, 22);
             label3.TabIndex = 1;
-            label3.Text = "CPU";
+            label3.Text = "RAM";
             // 
             // label7
             // 
@@ -517,9 +517,9 @@
             Controls.Add(button3);
             Controls.Add(panelTopBar);
             Controls.Add(button1);
+            Controls.Add(panelSystem);
             Controls.Add(panelUSBDisplay);
             Controls.Add(panelSetting);
-            Controls.Add(panelSystem);
             ForeColor = SystemColors.AppWorkspace;
             FormBorderStyle = FormBorderStyle.None;
             Name = "Form1";
